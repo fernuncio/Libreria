@@ -16,6 +16,8 @@ namespace Libreria
     public partial class Form1 : Form
     {
         WebSocketServer servidor;
+        private WebSocket cliente;
+
         public Form1()
         {
             InitializeComponent();
@@ -49,6 +51,33 @@ namespace Libreria
             servidor.AddWebSocketService<Notificacion>("/notificar");
             servidor.Start();
             MessageBox.Show("Servidor WebSocket iniciado en ws://TU_IP:8080/notificar", "Servidor Activo");
+
+            //cliente 
+            cliente = new WebSocket("ws://192.168.85.157:8080/notificar"); // IP del servidor
+
+            cliente.OnMessage += (ws_sender, ws_e) =>
+            {
+                this.Invoke(new Action(() =>
+                {
+                    MessageBox.Show("Notificación recibida: " + ws_e.Data);
+                    mostrarDatos();
+                }));
+            };
+
+            cliente.OnOpen += (ws_sender, ws_e) =>
+            {
+                Console.WriteLine("✅ Conectado al servidor WebSocket");
+            };
+
+            cliente.OnError += (ws_sender, ws_e) =>
+            {
+                this.Invoke(new Action(() =>
+                {
+                    MessageBox.Show("Error en WebSocket: " + ws_e.Message);
+                }));
+            };
+
+            cliente.Connect();
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
@@ -63,6 +92,7 @@ namespace Libreria
             libro.ShowDialog();
             mostrarDatos();
             NotificarATodos("SE AGREGO UN NUEVO LIBRO");
+            mostrarDatos();
         }
 
         private void actualizarToolStripMenuItem_Click(object sender, EventArgs e)
@@ -79,6 +109,7 @@ namespace Libreria
             libro.ShowDialog();
             mostrarDatos();
             NotificarATodos("SE ACTUALIZO UN LIBRO");
+            mostrarDatos();
         }
 
         private void eliminarToolStripMenuItem_Click(object sender, EventArgs e)
@@ -99,6 +130,7 @@ namespace Libreria
                     MessageBox.Show("Libro Eliminado Con Exito", "REGISTRO",
                 MessageBoxButtons.OK, MessageBoxIcon.Information);
                     NotificarATodos("SE ELIMINO UN LIBRO");
+                    mostrarDatos();
                 }
                 catch (Exception ex)
                 {
@@ -117,6 +149,7 @@ namespace Libreria
                 try
                 {
                     cliente.Enviar(mensaje);
+                    
                 }
                 catch (Exception ex)
                 {
