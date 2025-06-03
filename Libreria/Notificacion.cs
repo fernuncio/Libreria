@@ -23,10 +23,10 @@ namespace Libreria
             Clientes.Remove(this);
         }
 
+        // Opcional pero útil para depurar
         protected override void OnMessage(MessageEventArgs e)
         {
-            // Opcional: aquí puedes recibir mensajes del cliente
-            System.Windows.Forms.Application.OpenForms[0].BeginInvoke(new Action(() =>
+            Application.OpenForms[0].BeginInvoke(new Action(() =>
             {
                 MessageBox.Show("📨 Mensaje recibido: " + e.Data, "Servidor WebSocket");
             }));
@@ -36,5 +36,30 @@ namespace Libreria
         {
             Send(mensaje);
         }
+        //public static List<Notificacion> Clientes = new List<Notificacion>();
+
+        //protected override void OnOpen()
+        //{
+        //    Clientes.Add(this);
+        //}
+
+        //protected override void OnClose(CloseEventArgs e)
+        //{
+        //    Clientes.Remove(this);
+        //}
+
+        //protected override void OnMessage(MessageEventArgs e)
+        //{
+        //    // Opcional: aquí puedes recibir mensajes del cliente
+        //    System.Windows.Forms.Application.OpenForms[0].BeginInvoke(new Action(() =>
+        //    {
+        //        MessageBox.Show("📨 Mensaje recibido: " + e.Data, "Servidor WebSocket");
+        //    }));
+        //}
+
+        //public void Enviar(string mensaje)
+        //{
+        //    Send(mensaje);
+        //}
     }
 }
