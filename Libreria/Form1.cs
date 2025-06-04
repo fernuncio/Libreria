@@ -48,8 +48,28 @@ namespace Libreria
             mostrarDatos();
             //servidor
             iniciarServidor();
-            cliente = new Cliente("ws://0.0.0.0:8080/notificar");
+            Notificacion.MensajeRecibido += Notificacion_MensajeRecibido;
+            cliente = new Cliente("ws://10.13.54.113:8080/notificar");
             cliente.conectar();
+
+        }
+
+        private void Notificacion_MensajeRecibido(string msj)
+        {
+            if (msj != "")
+            {
+                if (InvokeRequired)
+                {
+                    BeginInvoke(new Action(() =>
+                    {
+                        mostrarDatos();
+                    }));
+                }
+                else
+                {
+                    mostrarDatos();
+                }
+            }
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
@@ -63,8 +83,9 @@ namespace Libreria
             Libro libro = new Libro();
             libro.ShowDialog();
             mostrarDatos();
-            NotificarATodos("SE AGREGO UN NUEVO LIBRO");
+            //NotificarATodos("SE AGREGO UN NUEVO LIBRO");
             mostrarDatos();
+            cliente.enviar("Libro Agregado");
         }
 
         private void actualizarToolStripMenuItem_Click(object sender, EventArgs e)
@@ -79,9 +100,10 @@ namespace Libreria
                 dgvLibros.Rows[i].Cells[6].Value.ToString(),
                 dgvLibros.Rows[i].Cells[7].Value.ToString());
             libro.ShowDialog();
-            mostrarDatos();
-            NotificarATodos("SE ACTUALIZO UN LIBRO");
-            mostrarDatos();
+            //mostrarDatos();
+            //NotificarATodos("SE ACTUALIZO UN LIBRO");
+            cliente.enviar("SE ACTUALIZO UN LIBRO");
+            //mostrarDatos();
         }
 
         private void eliminarToolStripMenuItem_Click(object sender, EventArgs e)
@@ -98,10 +120,13 @@ namespace Libreria
                 {
                     int id = Convert.ToInt32(dgvLibros.Rows[i].Cells[0].Value.ToString());
                     //Conexion conexion = new Conexion();
-                    conexion.consulta("DELETE FROM libros WHERE id_libro =" + id);
+                    string consulta = "DELETE FROM libros WHERE id_libro =" + id;
+                    conexion.consulta(consulta);
+                    //Console.WriteLine(consulta);
                     MessageBox.Show("Libro Eliminado Con Exito", "REGISTRO",
                 MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    NotificarATodos("SE ELIMINO UN LIBRO");
+                    //NotificarATodos("SE ELIMINO UN LIBRO");
+                    cliente.enviar("SE ELIMINO UN LIBRO");
                     mostrarDatos();
                 }
                 catch (Exception ex)
