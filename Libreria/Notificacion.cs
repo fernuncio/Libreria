@@ -12,7 +12,7 @@ namespace Libreria
     internal class Notificacion : WebSocketBehavior
     {
         public static List<Notificacion> Clientes = new List<Notificacion>();
-
+        public static event Action<string> MensajeRecibido;
         protected override void OnOpen()
         {
             Clientes.Add(this);
@@ -30,37 +30,16 @@ namespace Libreria
             Application.OpenForms[0].BeginInvoke(new Action(() =>
             {
                 MessageBox.Show("Mensaje recibido: " + e.Data, "Servidor WebSocket");
+                MensajeRecibido?.Invoke(e.Data);
             }));
+            
         }
 
         public void Enviar(string mensaje)
         {
             Send(mensaje);
         }
-        //public static List<Notificacion> Clientes = new List<Notificacion>();
-
-        //protected override void OnOpen()
-        //{
-        //    Clientes.Add(this);
-        //}
-
-        //protected override void OnClose(CloseEventArgs e)
-        //{
-        //    Clientes.Remove(this);
-        //}
-
-        //protected override void OnMessage(MessageEventArgs e)
-        //{
-        //    // Opcional: aquí puedes recibir mensajes del cliente
-        //    System.Windows.Forms.Application.OpenForms[0].BeginInvoke(new Action(() =>
-        //    {
-        //        MessageBox.Show("📨 Mensaje recibido: " + e.Data, "Servidor WebSocket");
-        //    }));
-        //}
-
-        //public void Enviar(string mensaje)
-        //{
-        //    Send(mensaje);
-        //}
+        
+        
     }
 }
