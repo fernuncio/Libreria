@@ -16,16 +16,19 @@ namespace Libreria
     public partial class Form1 : Form
     {
         WebSocketServer servidor;
+        private Cliente cliente;
+        private Conexion conexion;
         public Form1()
         {
             InitializeComponent();
             this.StartPosition = FormStartPosition.CenterScreen;
+            conexion = new Conexion();
         }
 
         private void mostrarDatos()
         {
-            Conexion conecta = new Conexion();
-            DataSet resultado = conecta.consulta("SELECT id_libro AS 'ID LIBRO', " +
+            //Conexion conecta = new Conexion();
+            DataSet resultado = conexion.consulta("SELECT id_libro AS 'ID LIBRO', " +
                                      "titulo AS 'TITULO', " +
                                      "autor AS 'AUTOR', " +
                                      "editorial AS 'EDITORIAL', " +
@@ -43,12 +46,10 @@ namespace Libreria
         private void Form1_Load(object sender, EventArgs e)
         {
             mostrarDatos();
-            //modificar ip
-            servidor = new WebSocketServer("ws://0.0.0.0:8080"); // Acepta conexiones de cualquier IP
-            //servidor = new WebSocketServer("ws://192.168.85.115:8080");
-            servidor.AddWebSocketService<Notificacion>("/notificar");
-            servidor.Start();
-            MessageBox.Show("Servidor WebSocket iniciado en ws://TU_IP:8080/notificar", "Servidor Activo");
+            //servidor
+            iniciarServidor();
+            cliente = new Cliente("ws://0.0.0.0:8080/notificar");
+            cliente.conectar();
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
@@ -63,6 +64,7 @@ namespace Libreria
             libro.ShowDialog();
             mostrarDatos();
             NotificarATodos("SE AGREGO UN NUEVO LIBRO");
+            mostrarDatos();
         }
 
         private void actualizarToolStripMenuItem_Click(object sender, EventArgs e)
@@ -79,6 +81,7 @@ namespace Libreria
             libro.ShowDialog();
             mostrarDatos();
             NotificarATodos("SE ACTUALIZO UN LIBRO");
+            mostrarDatos();
         }
 
         private void eliminarToolStripMenuItem_Click(object sender, EventArgs e)
@@ -94,11 +97,12 @@ namespace Libreria
                 try
                 {
                     int id = Convert.ToInt32(dgvLibros.Rows[i].Cells[0].Value.ToString());
-                    Conexion conexion = new Conexion();
+                    //Conexion conexion = new Conexion();
                     conexion.consulta("DELETE FROM libros WHERE id_libro =" + id);
                     MessageBox.Show("Libro Eliminado Con Exito", "REGISTRO",
                 MessageBoxButtons.OK, MessageBoxIcon.Information);
                     NotificarATodos("SE ELIMINO UN LIBRO");
+                    mostrarDatos();
                 }
                 catch (Exception ex)
                 {
@@ -109,7 +113,6 @@ namespace Libreria
             }
             mostrarDatos();
         }
-
         private void NotificarATodos(string mensaje)
         {
             foreach (var cliente in Notificacion.Clientes)
@@ -117,6 +120,7 @@ namespace Libreria
                 try
                 {
                     cliente.Enviar(mensaje);
+                    
                 }
                 catch (Exception ex)
                 {
@@ -126,20 +130,16 @@ namespace Libreria
             }
         }
 
+        //servidor
+        private void iniciarServidor()
+        {
+            //modificar ip
+            servidor = new WebSocketServer("ws://0.0.0.0:8080"); // Acepta conexiones de cualquier IP
+            //servidor = new WebSocketServer("ws://192.168.85.115:8080");
+            servidor.AddWebSocketService<Notificacion>("/notificar");
+            servidor.Start();
+            MessageBox.Show("Servidor WebSocket iniciado en ws://TU_IP:8080/notificar", "Servidor Activo");
+        }
+
     }
-
-
-
-    //public class Notificacion : WebSocketBehavior
-    //{
-    //    protected override void OnMessage(MessageEventArgs e)
-    //    {
-    //        // Esto ejecuta el MessageBox en el hilo de la UI (evita problemas de hilos cruzados)
-    //        System.Windows.Forms.Application.OpenForms[0].BeginInvoke(new Action(() =>
-    //        {
-    //            MessageBox.Show("📨 Mensaje recibido: " + e.Data, "Servidor WebSocket");
-    //        }));
-    //    }
-    //}
-
 }
