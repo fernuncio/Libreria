@@ -16,6 +16,7 @@ namespace Libreria
         protected override void OnOpen()
         {
             Clientes.Add(this);
+            Console.WriteLine("Cliente Conectado");
         }
 
         protected override void OnClose(CloseEventArgs e)
@@ -28,7 +29,7 @@ namespace Libreria
         {
             Application.OpenForms[0].BeginInvoke(new Action(() =>
             {
-                MessageBox.Show("📨 Mensaje recibido: " + e.Data, "Servidor WebSocket");
+                MessageBox.Show("Mensaje recibido: " + e.Data, "Servidor WebSocket");
             }));
         }
 
