@@ -16,8 +16,9 @@ namespace Libreria
     public partial class Form1 : Form
     {
         WebSocketServer servidor;
-        private Cliente cliente;
+        private Cliente cliente,cliente2;
         private Conexion conexion;
+
         public Form1()
         {
             InitializeComponent();
@@ -49,8 +50,10 @@ namespace Libreria
             //servidor
             iniciarServidor();
             Notificacion.MensajeRecibido += Notificacion_MensajeRecibido;
-            cliente = new Cliente("ws://10.13.54.113:8080/notificar");
-            cliente.conectar();
+            //cliente = new Cliente("ws://10.13.54.113:8080/notificar");
+            cliente2 = new Cliente("ws://10.13.58.210:8080/notificar");
+            //cliente.conectar();
+            cliente2.conectar();
 
         }
 
@@ -85,7 +88,8 @@ namespace Libreria
             mostrarDatos();
             //NotificarATodos("SE AGREGO UN NUEVO LIBRO");
             mostrarDatos();
-            cliente.enviar("Libro Agregado");
+            //cliente.enviar("Libro Agregado");
+            cliente2.enviar("Libro Agregado");
         }
 
         private void actualizarToolStripMenuItem_Click(object sender, EventArgs e)
@@ -102,7 +106,8 @@ namespace Libreria
             libro.ShowDialog();
             //mostrarDatos();
             //NotificarATodos("SE ACTUALIZO UN LIBRO");
-            cliente.enviar("SE ACTUALIZO UN LIBRO");
+            //cliente.enviar("SE ACTUALIZO UN LIBRO");
+            cliente2.enviar("SE ACTUALIZO UN LIBRO");
             //mostrarDatos();
         }
 
@@ -126,7 +131,8 @@ namespace Libreria
                     MessageBox.Show("Libro Eliminado Con Exito", "REGISTRO",
                 MessageBoxButtons.OK, MessageBoxIcon.Information);
                     //NotificarATodos("SE ELIMINO UN LIBRO");
-                    cliente.enviar("SE ELIMINO UN LIBRO");
+                    //cliente.enviar("SE ELIMINO UN LIBRO");
+                    cliente2.enviar("SE ELIMINO UN LIBRO");
                     mostrarDatos();
                 }
                 catch (Exception ex)
